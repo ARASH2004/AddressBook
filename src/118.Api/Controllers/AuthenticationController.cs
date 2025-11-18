@@ -48,35 +48,33 @@ namespace _118.Api.Controllers
         
         private string HashPass(string pass)
         {
-            // Create a SHA256 hash algorithm instance using a 'using' statement
-            // This ensures the resource is properly disposed of after use
             using var sha256 = SHA256.Create();
-
-            // Convert the input password string to a byte array using UTF-8 encoding
             var bytes = Encoding.UTF8.GetBytes(pass);
-
-            // Compute the SHA256 hash from the byte array
             var hashBytes = sha256.ComputeHash(bytes);
-
-            // Convert the resulting hash bytes to a hexadecimal string
-            // (This is readable and commonly used for storing hash values)
             return Convert.ToHexString(hashBytes);
         }
         [HttpPost]
         public ActionResult<LoginResponceDto> Login([FromBody] LoginDto dto)
         {
-            
+
             var user = _userCrud.GetUserByUserName(dto.UserName);
-            var result = getLoginDto(user);
-            if (user == null) { result.ErorMessage = "User not Found or password is wrong"; }
-            else if (user.PasswordHash != HashPass(dto.Password)) { result.ErorMessage = "User not Found or password is wrong"; }
-            else
+
+            if (user == null || user.PasswordHash != HashPass(dto.Password))
             {
-                result.IsResponce = true;
-                result.ErorMessage = "valid User ";
-                result.Token = _jWTService.GenerateToken(user);
+                return Ok(new LoginResponceDto
+                {
+                    IsResponce = false,
+                    ErorMessage = "User not Found or password is wrong"
+                });
             }
-                return Ok(result);
+
+            var result = getLoginDto(user);
+            result.IsResponce = true;
+            result.ErorMessage = "valid User";
+            result.Token = _jWTService.GenerateToken(user);
+
+            return Ok(result);
+     
         }
         private LoginResponceDto getLoginDto(User user)
         {

@@ -3,6 +3,7 @@ using Application.Dtos.Addresses;
 using Application.Dtos.Contacts;
 using Domain.Entities;
 using Infrustructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Win32;
 
@@ -18,7 +19,7 @@ namespace _118.Api.Controllers
             this._contactCrud = contactCrud;
         }
 
-
+        [Authorize]
         [HttpGet]
         public ActionResult<List<ContactReadDto>> Search(string? firstname, string? lastname, string? address, string? number)
         {
