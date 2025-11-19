@@ -47,7 +47,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id   = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            new string[] {}
         }
     });
 });
@@ -76,13 +76,14 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add CORS
+var AllowAll = "_AllowAll";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy(name:AllowAll, policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.AllowAnyOrigin()   
+              .AllowAnyMethod()   
+              .AllowAnyHeader();  
     });
 });
 
@@ -96,8 +97,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
 
+app.UseCors((AllowAll));
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
